@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Dashboard - UniJourney</title>
+<link rel="stylesheet" href="dashboard2.css">
+</head>
+<body class="dash-body">
+
+  <div class="dash-wrapper">
+
+    <!-- Sidebar -->
+    <aside class="sidebar2">
+      <div class="brand">
+        <div class="logo-circle">U</div>
+        <span>UniJourney</span>
+        <span class="chevron">&#8249;</span>
+      </div>
+      <nav>
+        <a href="dashboard.html" class="active" id="navDashboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+          Dashboard
+        </a>
+        <a href="leads.html" id="navLeads">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.5 2.7-6 6-6s6 2.5 6 6"/><circle cx="17" cy="8" r="2.6"/><path d="M15.5 14.2c2.6.4 4.5 2.6 4.5 5.8"/></svg>
+          Leads
+        </a>
+        <a href="applications.html" id="navApplications">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/></svg>
+          Applications
+        </a>
+        <a href="universities.html" id="navUniversities">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4 2 8l10 4 10-4z"/><path d="M6 10.5v4.5c0 1.7 2.7 3 6 3s6-1.3 6-3v-4.5"/></svg>
+          Universities
+        </a>
+        <a href="documents.html" id="navDocumentsSidebar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+          Documents
+        </a>
+      </nav>
+
+      <div class="profile">
+        <div class="avatar" id="userInitials">U</div>
+        <div class="info">
+          <b id="userName">User</b>
+          <span>Admin</span>
+        </div>
+        <span class="chevron">&#8250;</span>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="dash-main2">
+
+      <div class="dash-header2">
+        <div>
+          <h1 id="greeting">Good afternoon</h1>
+          <p class="date" id="todayDate"></p>
+        </div>
+        <button class="range-select">Last 30 days &#9662;</button>
+      </div>
+
+      <!-- Stat cards -->
+      <div class="stat-grid2">
+        <div class="stat-card2">
+          <div class="top-row">
+            <span class="label">Total students</span>
+            <svg viewBox="0 0 46 16"><polyline points="0,12 8,10 16,11 24,5 32,7 46,2" fill="none" stroke="#2f6fb5" stroke-width="1.6"/></svg>
+          </div>
+          <div class="value">0</div>
+          <span class="badge">&#8593; +12%</span>
+        </div>
+        <div class="stat-card2">
+          <div class="top-row">
+            <span class="label">Active applications</span>
+            <svg viewBox="0 0 46 16"><polyline points="0,10 8,12 16,6 24,8 32,4 46,3" fill="none" stroke="#1F3864" stroke-width="1.6"/></svg>
+          </div>
+          <div class="value">0</div>
+          <span class="badge">&#8593; +8%</span>
+        </div>
+        <div class="stat-card2">
+          <div class="top-row">
+            <span class="label">Visa approved</span>
+            <svg viewBox="0 0 46 16"><polyline points="0,13 8,9 16,10 24,6 32,5 46,1" fill="none" stroke="#1c7a44" stroke-width="1.6"/></svg>
+          </div>
+          <div class="value">0</div>
+          <span class="badge">&#8593; +23%</span>
+        </div>
+        <div class="stat-card2">
+          <div class="top-row">
+            <span class="label">Conversion rate</span>
+            <svg viewBox="0 0 46 16"><polyline points="0,11 8,11 16,8 24,9 32,6 46,4" fill="none" stroke="#0f9b8e" stroke-width="1.6"/></svg>
+          </div>
+          <div class="value">0.0%</div>
+          <span class="badge">&#8593; +5%</span>
+        </div>
+      </div>
+
+      <!-- Student pipeline -->
+      <div class="card2">
+        <div class="card2-head">
+          <div>
+            <h2>Student pipeline</h2>
+            <p>Current funnel across all stages</p>
+          </div>
+          <a href="leads.html" id="navPipeline">View all &#8594;</a>
+        </div>
+
+        <div id="funnelBody"></div>
+      </div>
+
+      <div class="two-col">
+        <!-- Needs attention -->
+        <div class="card2">
+          <div class="card2-head">
+            <div>
+              <h2>Needs attention</h2>
+              <p>Items requiring action today</p>
+            </div>
+          </div>
+
+          <a class="attn-row" href="leads.html" id="navOverdue">
+            <div class="attn-icon red">&#9888;</div>
+            <div class="attn-label">Overdue follow-ups</div>
+            <div class="attn-count">0</div>
+          </a>
+          <a class="attn-row highlight" href="leads.html" id="navFollowup">
+            <div class="attn-icon orange">&#128337;</div>
+            <div class="attn-label">Follow-ups due today</div>
+            <div class="attn-count">0</div>
+            <span class="attn-arrow">&#8594;</span>
+          </a>
+          <a class="attn-row" href="documents.html" id="navDocsPending">
+            <div class="attn-icon gray">&#128196;</div>
+            <div class="attn-label">Documents pending</div>
+            <div class="attn-count">0</div>
+          </a>
+          <a class="attn-row" href="applications.html" id="navDeadlines">
+            <div class="attn-icon blue">&#128197;</div>
+            <div class="attn-label">Upcoming deadlines</div>
+            <div class="attn-count">0</div>
+          </a>
+        </div>
+
+        <!-- Top counselors -->
+        <div class="card2">
+          <div class="card2-head">
+            <div>
+              <h2>Top counselors</h2>
+              <p>This month's performance</p>
+            </div>
+            <a href="leads.html" id="navCounselors">View all &#8594;</a>
+          </div>
+
+          <table class="counselor-table">
+            <thead>
+              <tr><th>Counselor</th><th>Converted</th><th>Rate</th><th>Performance</th></tr>
+            </thead>
+            <tbody id="counselorBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Recent activity -->
+      <div class="card2">
+        <div class="card2-head">
+          <div>
+            <h2>Recent activity</h2>
+            <p>Latest updates across your team</p>
+          </div>
+          <a href="leads.html" id="navActivity">View all &#8594;</a>
+        </div>
+        <div id="activityBody">
+          <p class="activity-empty">No recent activity yet.</p>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <button class="chat-fab" title="Chat">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+  </button>
+
+  <script>
+    // ---- Logged-in user ----
+    const params = new URLSearchParams(window.location.search);
+    const name = params.get("name") || "User";
+    const email = params.get("email") || "";
+    const firstName = name.split(" ")[0];
+
+    document.getElementById("userName").textContent = name;
+    document.getElementById("userInitials").textContent =
+      name.split(" ").map(n => n.charAt(0)).slice(0, 2).join("").toUpperCase();
+
+    document.getElementById("navLeads").href =
+      `leads.html?name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}`;
+    ["navApplications", "navUniversities", "navDocumentsSidebar"].forEach(id => {
+      const el = document.getElementById(id);
+      const base = el.getAttribute("href").split("?")[0];
+      el.href = `${base}?name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}`;
+    });
+    ["navPipeline", "navCounselors", "navActivity", "navOverdue", "navFollowup"].forEach(id => {
+      document.getElementById(id).href =
+        `leads.html?name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}`;
+    });
+    document.getElementById("navDocsPending").href =
+      `documents.html?name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}`;
+    document.getElementById("navDeadlines").href =
+      `applications.html?name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}`;
+
+    // ---- Greeting based on time of day ----
+    const hour = new Date().getHours();
+    const greetWord = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+    document.getElementById("greeting").textContent = `${greetWord}, ${firstName.charAt(0)}`;
+
+    document.getElementById("todayDate").textContent =
+      new Date().toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+
+    // ---- Pipeline stages (0 = fresh account, matches live site with no leads yet) ----
+    const stages = [
+      { name: "New Lead", cls: "newlead", count: 0 },
+      { name: "Contacted", cls: "contacted", count: 0 },
+      { name: "Follow-up", cls: "followup", count: 0 },
+      { name: "Qualified", cls: "qualified", count: 0 },
+      { name: "Application Started", cls: "appstarted", count: 0 },
+      { name: "Documentation", cls: "documentation", count: 0 },
+      { name: "Submission", cls: "submission", count: 0 },
+      { name: "Approved", cls: "approved", count: 0 },
+      { name: "Rejected", cls: "rejected", count: 0 },
+      { name: "Converted", cls: "converted", count: 0 },
+      { name: "Lost", cls: "lost", count: 0 },
+    ];
+
+    const totalCount = stages.reduce((sum, s) => sum + s.count, 0);
+    const maxCount = Math.max(1, ...stages.map(s => s.count));
+    const funnelBody = document.getElementById("funnelBody");
+    stages.forEach(s => {
+      // When there's no real data yet, show a full colored bar (matches the live site's empty state)
+      const pct = totalCount === 0 ? 100 : Math.round((s.count / maxCount) * 100);
+      const row = document.createElement("div");
+      row.className = "funnel-row";
+      row.innerHTML = `
+        <div class="funnel-label stage-${s.cls}">${s.name}</div>
+        <div class="funnel-pill pill-${s.cls}"></div>
+        <div class="funnel-bar-track"><div class="funnel-bar-fill fill-${s.cls}" style="width:${pct}%"></div></div>
+        <div class="funnel-count">${s.count}</div>
+      `;
+      funnelBody.appendChild(row);
+    });
+
+    // ---- Top counselors (current logged-in user shown, matches live site) ----
+    document.getElementById("counselorBody").innerHTML = `
+      <tr>
+        <td>
+          <div class="counselor-name">
+            <div class="avatar">${name.split(" ").map(n => n.charAt(0)).slice(0, 2).join("").toUpperCase()}
+              <span class="badge-dot">1</span>
+            </div>
+            ${name}
+          </div>
+        </td>
+        <td>0</td>
+        <td>0%</td>
+        <td><div class="perf-bar-track"><div class="perf-bar-fill" style="width:0%"></div></div></td>
+      </tr>
+    `;
+  </script>
+</body>
+</html>

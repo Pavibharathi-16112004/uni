@@ -1,0 +1,287 @@
+/* Dashboard layout — matches uni-journey.vercel.app theme (#1F3864 navy) */
+
+body.dash-body {
+  display: block;
+  padding: 0;
+  background: #f5f6fa;
+  align-items: initial;
+  justify-content: initial;
+}
+
+.dash-wrapper {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ---------- Sidebar ---------- */
+.sidebar {
+  width: 230px;
+  background: #1F3864;
+  color: #fff;
+  padding: 24px 18px;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.sidebar .brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 32px;
+}
+
+.sidebar .brand .logo-circle {
+  margin-bottom: 0;
+  background: #ffffff;
+  color: #1F3864;
+  width: 38px;
+  height: 38px;
+  font-size: 18px;
+}
+
+.sidebar .brand span {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sidebar nav a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: #cdd6e8;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.sidebar nav a .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.7;
+}
+
+.sidebar nav a:hover {
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+}
+
+.sidebar nav a.active {
+  background: #fff;
+  color: #1F3864;
+  font-weight: 700;
+}
+
+.sidebar .logout {
+  margin-top: auto;
+  padding-top: 16px;
+}
+
+.sidebar .logout a {
+  color: #ffb4b4;
+}
+
+.sidebar .logout a:hover {
+  background: rgba(255,255,255,0.08);
+  color: #ff8080;
+}
+
+/* ---------- Main area ---------- */
+.dash-main {
+  flex: 1;
+  padding: 28px 36px;
+  max-width: 1200px;
+}
+
+.dash-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+}
+
+.dash-topbar h1 {
+  font-size: 22px;
+  color: #1a1a1a;
+}
+
+.dash-topbar .subtitle {
+  margin: 4px 0 0;
+}
+
+.dash-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dash-user .avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #e8ecf7;
+  color: #1F3864;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+}
+
+.dash-user .info {
+  line-height: 1.3;
+}
+
+.dash-user .info b {
+  display: block;
+  font-size: 14px;
+  color: #1a1a1a;
+}
+
+.dash-user .info span {
+  font-size: 12px;
+  color: #888;
+}
+
+/* ---------- Stat cards ---------- */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin-bottom: 28px;
+}
+
+.stat-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+  width: auto;
+}
+
+.stat-card .icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  margin-bottom: 14px;
+}
+
+.stat-card.leads .icon { background: #e8ecf7; color: #1F3864; }
+.stat-card.applications .icon { background: #fdf0e0; color: #b8730a; }
+.stat-card.universities .icon { background: #e3f3ea; color: #1c7a44; }
+.stat-card.documents .icon { background: #f3e6f7; color: #7a1cb0; }
+
+.stat-card .value {
+  font-size: 26px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.stat-card .label {
+  font-size: 13px;
+  color: #777;
+  margin-top: 2px;
+}
+
+/* ---------- Table card ---------- */
+.table-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 22px 24px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+  width: auto;
+}
+
+.table-card h2 {
+  font-size: 16px;
+  margin: 0 0 16px;
+  color: #1a1a1a;
+}
+
+table.leads-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+table.leads-table th {
+  text-align: left;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #999;
+  padding: 8px 10px;
+  border-bottom: 1px solid #eee;
+}
+
+table.leads-table td {
+  padding: 12px 10px;
+  font-size: 14px;
+  color: #333;
+  border-bottom: 1px solid #f2f2f2;
+}
+
+.stage-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.stage-new { background: #e8ecf7; color: #1F3864; }
+.stage-contacted { background: #fdf0e0; color: #b8730a; }
+.stage-applied { background: #e0eefb; color: #0d6dad; }
+.stage-offer { background: #e3f3ea; color: #1c7a44; }
+.stage-enrolled { background: #e3f3ea; color: #146134; }
+
+/* ---------- Filter chips (Leads page) ---------- */
+.filter-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.filter-chip {
+  border: 1px solid #ddd;
+  background: #fff;
+  color: #555;
+  padding: 7px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.filter-chip:hover {
+  border-color: #1F3864;
+}
+
+.filter-chip.active {
+  background: #1F3864;
+  border-color: #1F3864;
+  color: #fff;
+}
+
+@media (max-width: 900px) {
+  .dash-wrapper { flex-direction: column; }
+  .sidebar { width: 100%; flex-direction: row; align-items: center; padding: 14px 18px; }
+  .sidebar nav { flex-direction: row; overflow-x: auto; }
+  .sidebar .logout { margin-top: 0; margin-left: auto; padding-top: 0; }
+  .stat-grid { grid-template-columns: repeat(2, 1fr); }
+  .dash-main { padding: 20px; }
+}

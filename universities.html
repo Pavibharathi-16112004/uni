@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Universities - UniJourney</title>
+<link rel="stylesheet" href="dashboard2.css">
+<style>
+  .uni-topbar { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:22px; flex-wrap:wrap; gap:12px; }
+  .uni-topbar h1 { font-size:23px; margin:0; color:#1a1a1a; }
+  .uni-topbar .date { font-size:13px; color:#8a8f99; margin-top:4px; }
+  .uni-actions { display:flex; align-items:center; gap:10px; position:relative; }
+  .search-box {
+    display:flex; align-items:center; gap:6px;
+    border:1px solid #eceef2; background:#fff; border-radius:8px;
+    padding:8px 12px; font-size:13px; color:#8a8f99; min-width:190px;
+  }
+  .search-box input { border:none; outline:none; font-size:13px; width:100%; }
+  .dropdown-wrap { position:relative; }
+  .dropdown-btn {
+    border:1px solid #eceef2; background:#fff; color:#444;
+    font-size:13px; padding:8px 14px; border-radius:8px; cursor:pointer;
+    display:flex; align-items:center; gap:6px; white-space:nowrap;
+  }
+  .dropdown-panel {
+    display:none; position:absolute; top:calc(100% + 6px); left:0; background:#fff;
+    border:1px solid #eceef2; border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,.08);
+    min-width:170px; z-index:40; padding:6px;
+  }
+  .dropdown-panel.open { display:block; }
+  .dropdown-item { padding:8px 10px; font-size:13px; color:#333; border-radius:6px; cursor:pointer; }
+  .dropdown-item:hover { background:#f2f3f7; }
+  .dropdown-item.active { background:#eef1fb; color:#1F3864; font-weight:600; }
+  .add-uni-btn {
+    background:#111; color:#fff; border:none; border-radius:8px;
+    font-size:13px; font-weight:600; padding:9px 16px; cursor:pointer;
+    display:flex; align-items:center; gap:6px; white-space:nowrap;
+  }
+
+  .stat-row { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:20px; }
+  .stat-box { background:#fff; border:1px solid #eceef2; border-radius:12px; padding:18px 20px; }
+  .stat-box .value { font-size:26px; font-weight:700; color:#1a1a1a; margin-bottom:4px; }
+  .stat-box .label { font-size:13px; color:#8a8f99; }
+
+  .empty-state { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:80px 20px; text-align:center; }
+  .empty-icon {
+    width:56px; height:56px; border-radius:50%; background:#f2f3f7; color:#8a8f99;
+    display:flex; align-items:center; justify-content:center; margin-bottom:18px;
+  }
+  .empty-state h3 { font-size:16px; margin:0 0 6px; color:#1a1a1a; }
+  .empty-state p { font-size:13.5px; color:#8a8f99; margin:0 0 20px; }
+  .empty-add-btn {
+    background:#111; color:#fff; border:none; border-radius:8px;
+    font-size:13.5px; font-weight:600; padding:10px 20px; cursor:pointer;
+  }
+
+  .uni-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:16px; }
+  .uni-card { background:#fff; border:1px solid #eceef2; border-radius:12px; padding:18px 20px; }
+  .uni-card .uc-head { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:6px; }
+  .uni-card h4 { font-size:15px; margin:0; color:#1a1a1a; }
+  .uni-card .uc-loc { font-size:12.5px; color:#8a8f99; margin-bottom:12px; }
+  .partner-badge { display:inline-block; padding:3px 9px; border-radius:20px; font-size:11px; font-weight:700; white-space:nowrap; }
+  .partner-standard { background:#eef0f4; color:#5b6270; }
+  .partner-premium { background:#eaf7ee; color:#1c7a44; }
+  .partner-preferred { background:#e8ecf7; color:#1F3864; }
+  .uc-row { display:flex; justify-content:space-between; font-size:12.5px; color:#5b6270; padding:5px 0; border-top:1px solid #f5f5f7; }
+  .uc-row b { color:#1a1a1a; font-weight:600; }
+  .uc-intakes { display:flex; gap:6px; flex-wrap:wrap; margin-top:10px; }
+  .intake-chip { background:#f2f3f7; color:#5b6270; font-size:11px; padding:3px 8px; border-radius:20px; }
+  .uc-remove { margin-top:12px; width:100%; }
+
+  /* Modal */
+  .modal-overlay {
+    display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4);
+    align-items:center; justify-content:center; z-index:50;
+  }
+  .modal-overlay.open { display:flex; }
+  .modal-box {
+    background:#fff; border-radius:14px; width:520px; max-width:92vw;
+    max-height:86vh; overflow-y:auto; padding:24px 26px;
+  }
+  .modal-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; }
+  .modal-head h3 { font-size:17px; margin:0; color:#1a1a1a; }
+  .modal-close { border:none; background:none; font-size:18px; color:#888; cursor:pointer; line-height:1; }
+  .form-field { margin-bottom:14px; }
+  .form-field label { display:block; font-size:12.5px; color:#444; margin-bottom:6px; font-weight:500; }
+  .form-field input, .form-field select {
+    width:100%; padding:9px 11px; border:1px solid #ddd; border-radius:8px; font-size:13.5px; color:#333;
+    font-family:inherit; box-sizing:border-box;
+  }
+  .form-row-2 { display:grid; grid-template-columns:1fr 1fr; gap:14px 16px; }
+  .stepper { display:flex; align-items:center; border:1px solid #ddd; border-radius:8px; overflow:hidden; }
+  .stepper button { width:34px; height:36px; border:none; background:#fafafa; color:#444; font-size:16px; cursor:pointer; flex-shrink:0; }
+  .stepper button:hover { background:#f0f0f0; }
+  .stepper input { border:none !important; text-align:center; padding:9px 4px !important; }
+  .multiselect { position:relative; }
+  .multiselect-btn {
+    width:100%; text-align:left; padding:9px 11px; border:1px solid #ddd; border-radius:8px;
+    font-size:13.5px; color:#333; background:#fff; cursor:pointer; box-sizing:border-box;
+  }
+  .multiselect-panel {
+    display:none; position:absolute; top:calc(100% + 4px); left:0; right:0; background:#fff;
+    border:1px solid #eceef2; border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,.1); z-index:60; padding:6px;
+  }
+  .multiselect-panel.open { display:block; }
+  .multiselect-option { display:flex; align-items:center; gap:8px; padding:7px 8px; font-size:13px; border-radius:6px; cursor:pointer; }
+  .multiselect-option:hover { background:#f2f3f7; }
+  .modal-footer { display:flex; justify-content:flex-end; gap:10px; margin-top:22px; }
+  .btn-cancel { background:#fff; border:1px solid #ddd; color:#444; border-radius:8px; padding:9px 18px; font-size:13.5px; cursor:pointer; }
+  .btn-submit { background:#555; border:none; color:#fff; border-radius:8px; padding:9px 18px; font-size:13.5px; font-weight:600; cursor:pointer; }
+</style>
+</head>
+<body class="dash-body">
+  <div class="dash-wrapper">
+    <aside class="sidebar2">
+      <div class="brand">
+        <div class="logo-circle">U</div>
+        <span>UniJourney</span>
+        <span class="chevron">&#8249;</span>
+      </div>
+      <nav>
+        <a href="dashboard.html" id="navDashboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+          Dashboard
+        </a>
+        <a href="leads.html" id="navLeads">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.5 2.7-6 6-6s6 2.5 6 6"/><circle cx="17" cy="8" r="2.6"/><path d="M15.5 14.2c2.6.4 4.5 2.6 4.5 5.8"/></svg>
+          Leads
+        </a>
+        <a href="applications.html" id="navApplications">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/></svg>
+          Applications
+        </a>
+        <a href="universities.html" class="active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4 2 8l10 4 10-4z"/><path d="M6 10.5v4.5c0 1.7 2.7 3 6 3s6-1.3 6-3v-4.5"/></svg>
+          Universities
+        </a>
+        <a href="documents.html" id="navDocuments">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+          Documents
+        </a>
+      </nav>
+      <div class="profile">
+        <div class="avatar" id="userInitials">U</div>
+        <div class="info"><b id="userName">User</b><span>Admin</span></div>
+        <span class="chevron">&#8250;</span>
+      </div>
+    </aside>
+
+    <main class="dash-main2">
+
+      <div class="uni-topbar">
+        <div>
+          <h1>Universities</h1>
+          <p class="date">Partner university database</p>
+        </div>
+        <div class="uni-actions">
+          <div class="search-box">
+            <span>&#128269;</span>
+            <input type="text" placeholder="Search universities..." id="searchInput">
+          </div>
+          <div class="dropdown-wrap">
+            <button class="dropdown-btn" id="countryFilterBtn">Country &#9662;</button>
+            <div class="dropdown-panel" id="countryFilterPanel"></div>
+          </div>
+          <div class="dropdown-wrap">
+            <button class="dropdown-btn" id="intakeFilterBtn">Intake &#9662;</button>
+            <div class="dropdown-panel" id="intakeFilterPanel"></div>
+          </div>
+          <button class="add-uni-btn" id="openModalBtn">+ Add University</button>
+        </div>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat-box"><div class="value" id="statTotal">0</div><div class="label">Total Partners</div></div>
+        <div class="stat-box"><div class="value" id="statUK">0</div><div class="label">UK Universities</div></div>
+        <div class="stat-box"><div class="value" id="statActiveApps">0</div><div class="label">Active Applications</div></div>
+        <div class="stat-box"><div class="value" id="statAvgAcceptance">68%</div><div class="label">Avg Acceptance</div></div>
+      </div>
+
+      <div id="emptyState" class="empty-state">
+        <div class="empty-icon">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4 2 8l10 4 10-4z"/><path d="M6 10.5v4.5c0 1.7 2.7 3 6 3s6-1.3 6-3v-4.5"/></svg>
+        </div>
+        <h3>No universities found</h3>
+        <p>Add your first university partner to get started</p>
+        <button class="empty-add-btn" id="addFirstBtn">+ Add University</button>
+      </div>
+
+      <div class="uni-grid" id="uniGrid" style="display:none;"></div>
+
+    </main>
+  </div>
+
+  <!-- Add University modal -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal-box">
+      <div class="modal-head">
+        <h3>Add University</h3>
+        <button class="modal-close" id="closeModalBtn">&times;</button>
+      </div>
+      <form id="uniForm">
+        <div class="form-field">
+          <label>University Name *</label>
+          <input type="text" id="fName" required>
+        </div>
+        <div class="form-row-2">
+          <div class="form-field">
+            <label>Country *</label>
+            <select id="fCountry" required>
+              <option>USA</option>
+              <option>UK</option>
+              <option>Canada</option>
+              <option>Australia</option>
+              <option>Germany</option>
+              <option>Ireland</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label>City</label>
+            <input type="text" id="fCity">
+          </div>
+        </div>
+        <div class="form-row-2">
+          <div class="form-field">
+            <label>Courses Count</label>
+            <div class="stepper">
+              <button type="button" id="stepMinus">&minus;</button>
+              <input type="number" id="fCourses" value="0" min="0">
+              <button type="button" id="stepPlus">+</button>
+            </div>
+          </div>
+          <div class="form-field">
+            <label>Partner Status</label>
+            <select id="fPartnerStatus">
+              <option>Standard</option>
+              <option>Preferred</option>
+              <option>Premium</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row-2">
+          <div class="form-field">
+            <label>Tuition Range</label>
+            <input type="text" id="fTuitionRange" placeholder="e.g. $20k - $40k">
+          </div>
+          <div class="form-field">
+            <label>Intakes (Multi-select)</label>
+            <div class="multiselect">
+              <button type="button" class="multiselect-btn" id="intakeMsBtn">Select intakes</button>
+              <div class="multiselect-panel" id="intakeMsPanel">
+                <label class="multiselect-option"><input type="checkbox" value="Fall"> Fall</label>
+                <label class="multiselect-option"><input type="checkbox" value="Spring"> Spring</label>
+                <label class="multiselect-option"><input type="checkbox" value="Summer"> Summer</label>
+                <label class="multiselect-option"><input type="checkbox" value="Winter"> Winter</label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-cancel" id="cancelModalBtn">Cancel</button>
+          <button type="submit" class="btn-submit">Add University</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <button class="chat-fab" title="Chat">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+  </button>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const name = params.get("name") || "User";
+    const email = params.get("email") || "";
+    document.getElementById("userName").textContent = name;
+    document.getElementById("userInitials").textContent =
+      name.split(" ").map(n => n.charAt(0)).slice(0, 2).join("").toUpperCase();
+    ["navDashboard", "navLeads", "navApplications", "navDocuments"].forEach(id => {
+      const el = document.getElementById(id);
+      const base = el.getAttribute("href").split("?")[0];
+      el.href = `${base}?name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}`;
+    });
+
+    // ---- State ----
+    let universities = [];
+    let searchTerm = "";
+    let countryFilter = "All Countries";
+    let intakeFilter = "All Intakes";
+
+    const badgeClass = { "Standard": "partner-standard", "Preferred": "partner-preferred", "Premium": "partner-premium" };
+
+    // ---- Country / Intake filter dropdowns (top bar) ----
+    const countries = ["All Countries", "USA", "UK", "Canada", "Australia", "Germany", "Ireland"];
+    const intakesList = ["All Intakes", "Fall", "Spring", "Summer", "Winter"];
+
+    function buildFilterPanel(panelEl, btnEl, options, currentVal, onPick) {
+      panelEl.innerHTML = options.map(o =>
+        `<div class="dropdown-item ${o === currentVal ? "active" : ""}" data-val="${o}">${o}</div>`
+      ).join("");
+      panelEl.querySelectorAll(".dropdown-item").forEach(item => {
+        item.addEventListener("click", () => {
+          onPick(item.dataset.val);
+          panelEl.classList.remove("open");
+        });
+      });
+    }
+
+    const countryBtn = document.getElementById("countryFilterBtn");
+    const countryPanel = document.getElementById("countryFilterPanel");
+    const intakeBtn = document.getElementById("intakeFilterBtn");
+    const intakePanel = document.getElementById("intakeFilterPanel");
+
+    function refreshFilterPanels() {
+      buildFilterPanel(countryPanel, countryBtn, countries, countryFilter, (val) => {
+        countryFilter = val;
+        countryBtn.textContent = (val === "All Countries" ? "Country" : val) + " \u25be";
+        refreshFilterPanels();
+        renderUniversities();
+      });
+      buildFilterPanel(intakePanel, intakeBtn, intakesList, intakeFilter, (val) => {
+        intakeFilter = val;
+        intakeBtn.textContent = (val === "All Intakes" ? "Intake" : val) + " \u25be";
+        refreshFilterPanels();
+        renderUniversities();
+      });
+    }
+    refreshFilterPanels();
+
+    countryBtn.addEventListener("click", (e) => { e.stopPropagation(); intakePanel.classList.remove("open"); countryPanel.classList.toggle("open"); });
+    intakeBtn.addEventListener("click", (e) => { e.stopPropagation(); countryPanel.classList.remove("open"); intakePanel.classList.toggle("open"); });
+    document.addEventListener("click", () => { countryPanel.classList.remove("open"); intakePanel.classList.remove("open"); });
+
+    document.getElementById("searchInput").addEventListener("input", (e) => {
+      searchTerm = e.target.value.trim().toLowerCase();
+      renderUniversities();
+    });
+
+    // ---- Render ----
+    function renderUniversities() {
+      document.getElementById("statTotal").textContent = universities.length;
+      document.getElementById("statUK").textContent = universities.filter(u => u.country === "UK").length;
+      document.getElementById("statActiveApps").textContent = universities.reduce((sum, u) => sum + (Number(u.courses) || 0), 0);
+
+      const filtered = universities.filter(u => {
+        const matchesSearch = !searchTerm || u.name.toLowerCase().includes(searchTerm) || (u.city || "").toLowerCase().includes(searchTerm);
+        const matchesCountry = countryFilter === "All Countries" || u.country === countryFilter;
+        const matchesIntake = intakeFilter === "All Intakes" || (u.intakes || []).includes(intakeFilter);
+        return matchesSearch && matchesCountry && matchesIntake;
+      });
+
+      const emptyState = document.getElementById("emptyState");
+      const grid = document.getElementById("uniGrid");
+
+      if (universities.length === 0) {
+        emptyState.style.display = "flex";
+        grid.style.display = "none";
+        return;
+      }
+      emptyState.style.display = "none";
+      grid.style.display = "grid";
+
+      grid.innerHTML = filtered.map((u, i) => `
+        <div class="uni-card">
+          <div class="uc-head">
+            <h4>${u.name}</h4>
+            <span class="partner-badge ${badgeClass[u.partnerStatus] || "partner-standard"}">${u.partnerStatus}</span>
+          </div>
+          <div class="uc-loc">${[u.city, u.country].filter(Boolean).join(", ")}</div>
+          <div class="uc-row"><span>Courses</span><b>${u.courses || 0}</b></div>
+          <div class="uc-row"><span>Tuition Range</span><b>${u.tuitionRange || "-"}</b></div>
+          ${u.intakes && u.intakes.length ? `<div class="uc-intakes">${u.intakes.map(i => `<span class="intake-chip">${i}</span>`).join("")}</div>` : ""}
+          <button type="button" class="btn-cancel uc-remove" data-remove="${i}">Remove</button>
+        </div>
+      `).join("") || `<div style="grid-column:1/-1; text-align:center; color:#8a8f99; padding:40px 0;">No universities match your filters.</div>`;
+
+      grid.querySelectorAll("[data-remove]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const idx = universities.indexOf(filtered[Number(btn.dataset.remove)]);
+          if (idx > -1) universities.splice(idx, 1);
+          renderUniversities();
+        });
+      });
+    }
+
+    // ---- Modal ----
+    const overlay = document.getElementById("modalOverlay");
+    function openModal() { overlay.classList.add("open"); }
+    function closeModal() {
+      overlay.classList.remove("open");
+      document.getElementById("uniForm").reset();
+      document.getElementById("fCourses").value = 0;
+      intakeMsPanel.querySelectorAll("input[type=checkbox]").forEach(cb => cb.checked = false);
+      updateIntakeMsLabel();
+    }
+    document.getElementById("openModalBtn").addEventListener("click", openModal);
+    document.getElementById("addFirstBtn").addEventListener("click", openModal);
+    document.getElementById("closeModalBtn").addEventListener("click", closeModal);
+    document.getElementById("cancelModalBtn").addEventListener("click", closeModal);
+    overlay.addEventListener("click", (e) => { if (e.target === overlay) closeModal(); });
+
+    // ---- Courses stepper ----
+    const fCourses = document.getElementById("fCourses");
+    document.getElementById("stepMinus").addEventListener("click", () => { fCourses.value = Math.max(0, Number(fCourses.value || 0) - 1); });
+    document.getElementById("stepPlus").addEventListener("click", () => { fCourses.value = Number(fCourses.value || 0) + 1; });
+
+    // ---- Intakes multi-select ----
+    const intakeMsBtn = document.getElementById("intakeMsBtn");
+    const intakeMsPanel = document.getElementById("intakeMsPanel");
+    function updateIntakeMsLabel() {
+      const checked = [...intakeMsPanel.querySelectorAll("input[type=checkbox]:checked")].map(cb => cb.value);
+      intakeMsBtn.textContent = checked.length ? checked.join(", ") : "Select intakes";
+    }
+    intakeMsBtn.addEventListener("click", (e) => { e.stopPropagation(); intakeMsPanel.classList.toggle("open"); });
+    intakeMsPanel.addEventListener("click", (e) => e.stopPropagation());
+    intakeMsPanel.querySelectorAll("input[type=checkbox]").forEach(cb => cb.addEventListener("change", updateIntakeMsLabel));
+    document.addEventListener("click", () => intakeMsPanel.classList.remove("open"));
+
+    document.getElementById("uniForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const selectedIntakes = [...intakeMsPanel.querySelectorAll("input[type=checkbox]:checked")].map(cb => cb.value);
+      universities.push({
+        name: document.getElementById("fName").value,
+        country: document.getElementById("fCountry").value,
+        city: document.getElementById("fCity").value,
+        courses: document.getElementById("fCourses").value,
+        partnerStatus: document.getElementById("fPartnerStatus").value,
+        tuitionRange: document.getElementById("fTuitionRange").value,
+        intakes: selectedIntakes,
+      });
+      closeModal();
+      renderUniversities();
+    });
+
+    renderUniversities();
+  </script>
+</body>
+</html>
