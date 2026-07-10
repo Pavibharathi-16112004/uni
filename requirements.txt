@@ -5,3 +5,4 @@ passlib[bcrypt]
 authlib
 itsdangerous
 python-dotenv
+httpx
