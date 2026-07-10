@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Leads - UniJourney</title>
+<link rel="stylesheet" href="dashboard2.css">
+<style>
+  .leads-topbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:22px; flex-wrap:wrap; gap:12px; }
+  .leads-topbar h1 { font-size:23px; margin:0; color:#1a1a1a; }
+  .leads-topbar .date { font-size:13px; color:#8a8f99; margin-top:4px; }
+  .leads-actions { display:flex; align-items:center; gap:10px; }
+  .search-box {
+    display:flex; align-items:center; gap:6px;
+    border:1px solid #eceef2; background:#fff; border-radius:8px;
+    padding:8px 12px; font-size:13px; color:#8a8f99; min-width:190px;
+  }
+  .search-box input { border:none; outline:none; font-size:13px; width:100%; }
+  .dropdown-btn {
+    border:1px solid #eceef2; background:#fff; color:#444;
+    font-size:13px; padding:8px 14px; border-radius:8px; cursor:pointer;
+    display:flex; align-items:center; gap:6px; white-space:nowrap;
+  }
+  .new-lead-btn {
+    background:#111; color:#fff; border:none; border-radius:8px;
+    font-size:13px; font-weight:600; padding:9px 16px; cursor:pointer;
+    display:flex; align-items:center; gap:6px; white-space:nowrap;
+  }
+
+  .mini-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:20px; }
+  .mini-stat { background:#fff; border:1px solid #eceef2; border-radius:12px; padding:18px 20px; }
+  .mini-stat .value { font-size:24px; font-weight:700; color:#1a1a1a; }
+  .mini-stat .label { font-size:13px; color:#8a8f99; margin-top:4px; }
+
+  .tabs { display:flex; gap:22px; border-bottom:1px solid #eceef2; margin-bottom:36px; }
+  .tab { font-size:13.5px; font-weight:600; color:#8a8f99; padding:10px 2px; cursor:pointer; border-bottom:2px solid transparent; }
+  .tab.active { color:#1a1a1a; border-bottom-color:#1a1a1a; }
+
+  .empty-state { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:70px 20px; text-align:center; }
+  .empty-icon {
+    width:56px; height:56px; border-radius:50%; background:#f2f3f7;
+    display:flex; align-items:center; justify-content:center; margin-bottom:18px; color:#8a8f99;
+  }
+  .empty-state h3 { font-size:16px; margin:0 0 6px; color:#1a1a1a; }
+  .empty-state p { font-size:13.5px; color:#8a8f99; margin:0 0 20px; }
+  .empty-add-btn {
+    background:#111; color:#fff; border:none; border-radius:8px;
+    font-size:13.5px; font-weight:600; padding:10px 20px; cursor:pointer;
+  }
+
+  /* Modal */
+  .modal-overlay {
+    display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4);
+    align-items:center; justify-content:center; z-index:50;
+  }
+  .modal-overlay.open { display:flex; }
+  .modal-box {
+    background:#fff; border-radius:14px; width:560px; max-width:92vw;
+    max-height:86vh; overflow-y:auto; padding:24px 26px;
+  }
+  .modal-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; }
+  .modal-head h3 { font-size:17px; margin:0; color:#1a1a1a; }
+  .modal-close { border:none; background:none; font-size:18px; color:#888; cursor:pointer; line-height:1; }
+  .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px 16px; }
+  .form-field label { display:block; font-size:12.5px; color:#444; margin-bottom:6px; font-weight:500; }
+  .form-field input, .form-field select {
+    width:100%; padding:9px 11px; border:1px solid #ddd; border-radius:8px; font-size:13.5px; color:#333;
+  }
+  .modal-footer { display:flex; justify-content:flex-end; gap:10px; margin-top:22px; }
+  .btn-cancel { background:#fff; border:1px solid #ddd; color:#444; border-radius:8px; padding:9px 18px; font-size:13.5px; cursor:pointer; }
+  .btn-submit { background:#1F3864; border:none; color:#fff; border-radius:8px; padding:9px 18px; font-size:13.5px; font-weight:600; cursor:pointer; }
+
+  table.leads-table2 { width:100%; border-collapse:collapse; }
+  table.leads-table2 th { text-align:left; font-size:11.5px; text-transform:uppercase; letter-spacing:.03em; color:#8a8f99; padding:0 8px 10px; font-weight:600; border-bottom:1px solid #eceef2; }
+  table.leads-table2 td { padding:12px 8px; font-size:13.5px; color:#1a1a1a; border-bottom:1px solid #f5f5f7; }
+  .stage-badge { display:inline-block; padding:4px 10px; border-radius:20px; font-size:12px; font-weight:600; }
+  .stage-new { background:#e8ecf7; color:#1F3864; }
+  .stage-contacted { background:#f1e9f7; color:#7d5aa6; }
+  .stage-followup { background:#fdf0e0; color:#c07a1e; }
+  .stage-qualified { background:#e3f3ea; color:#1c7a44; }
+</style>
+</head>
+<body class="dash-body">
+
+  <div class="dash-wrapper">
+
+    <!-- Sidebar -->
+    <aside class="sidebar2">
+      <div class="brand">
+        <div class="logo-circle">U</div>
+        <span>UniJourney</span>
+        <span class="chevron">&#8249;</span>
+      </div>
+      <nav>
+        <a href="dashboard.html" id="navDashboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+          Dashboard
+        </a>
+        <a href="leads.html" class="active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.5 2.7-6 6-6s6 2.5 6 6"/><circle cx="17" cy="8" r="2.6"/><path d="M15.5 14.2c2.6.4 4.5 2.6 4.5 5.8"/></svg>
+          Leads
+        </a>
+        <a href="applications.html" id="navApplications">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/></svg>
+          Applications
+        </a>
+        <a href="universities.html" id="navUniversities">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4 2 8l10 4 10-4z"/><path d="M6 10.5v4.5c0 1.7 2.7 3 6 3s6-1.3 6-3v-4.5"/></svg>
+          Universities
+        </a>
+        <a href="documents.html" id="navDocuments">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+          Documents
+        </a>
+      </nav>
+
+      <div class="profile">
+        <div class="avatar" id="userInitials">U</div>
+        <div class="info">
+          <b id="userName">User</b>
+          <span>Admin</span>
+        </div>
+        <span class="chevron">&#8250;</span>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="dash-main2">
+
+      <div class="leads-topbar">
+        <div>
+          <h1>Leads</h1>
+          <p class="date">Manage and track all prospect inquiries</p>
+        </div>
+        <div class="leads-actions">
+          <div class="search-box">
+            <span>&#128269;</span>
+            <input type="text" placeholder="Search students..." id="searchInput">
+          </div>
+          <button class="dropdown-btn">Sort by &#9662;</button>
+          <button class="dropdown-btn">All Statuses &#9662;</button>
+          <button class="new-lead-btn" id="openModalBtn">+ New lead</button>
+        </div>
+      </div>
+
+      <div class="mini-stats">
+        <div class="mini-stat"><div class="value" id="statNewLeads">0</div><div class="label">New leads</div></div>
+        <div class="mini-stat"><div class="value" id="statClosed">0</div><div class="label">Closed</div></div>
+        <div class="mini-stat"><div class="value" id="statLost">0</div><div class="label">Lost</div></div>
+        <div class="mini-stat"><div class="value" id="statTotalClosed">$0</div><div class="label">Total closed</div></div>
+      </div>
+
+      <div class="tabs">
+        <div class="tab active" data-tab="list">List</div>
+        <div class="tab" data-tab="board">Board</div>
+        <div class="tab" data-tab="pipeline">Pipeline</div>
+        <div class="tab" data-tab="groups">Groups</div>
+      </div>
+
+      <!-- List / Board / Pipeline views -->
+      <div id="leadsView">
+        <!-- Empty state (shown when there are no leads yet) -->
+        <div class="empty-state" id="emptyState">
+          <div class="empty-icon">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.5 2.7-6 6-6s6 2.5 6 6"/><circle cx="17" cy="8" r="2.6"/><path d="M15.5 14.2c2.6.4 4.5 2.6 4.5 5.8"/></svg>
+          </div>
+          <h3>No leads found</h3>
+          <p>Get started by adding your first lead to the system.</p>
+          <button class="empty-add-btn" id="addFirstLeadBtn">Add first lead</button>
+        </div>
+
+        <!-- Leads table (shown once leads exist) -->
+        <div class="card2" id="leadsTableCard" style="display:none;">
+          <table class="leads-table2">
+            <thead>
+              <tr><th>Name</th><th>Email</th><th>Phone</th><th>Status</th><th>Target Country</th></tr>
+            </thead>
+            <tbody id="leadsTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Groups view -->
+      <div id="groupsView" style="display:none;">
+        <div class="empty-state" id="groupsEmptyState">
+          <div class="empty-icon">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <h3>No groups yet</h3>
+          <p>Group your leads together — by intake, counselor, or campaign.</p>
+          <button class="empty-add-btn" id="createGroupBtn">Create group</button>
+        </div>
+
+        <div class="card2" id="groupsListCard" style="display:none;">
+          <table class="leads-table2">
+            <thead><tr><th>Group name</th><th>Description</th><th>Leads</th></tr></thead>
+            <tbody id="groupsTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Add new lead modal -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal-box">
+      <div class="modal-head">
+        <h3>Add new lead</h3>
+        <button class="modal-close" id="closeModalBtn">&times;</button>
+      </div>
+      <form id="leadForm">
+        <div class="form-grid">
+          <div class="form-field"><label>First name *</label><input type="text" id="firstName" required></div>
+          <div class="form-field"><label>Last name *</label><input type="text" id="lastName" required></div>
+          <div class="form-field"><label>Email</label><input type="email" id="leadEmail"></div>
+          <div class="form-field"><label>Phone</label><input type="text" id="leadPhone"></div>
+          <div class="form-field">
+            <label>Category</label>
+            <select id="category"><option>Study Abroad</option><option>Domestic</option><option>Visa Only</option></select>
+          </div>
+          <div class="form-field">
+            <label>Source</label>
+            <select id="source"><option>Website</option><option>Referral</option><option>WalkIn</option><option>Social Media</option></select>
+          </div>
+          <div class="form-field">
+            <label>Status</label>
+            <select id="status"><option>New Lead</option><option>Contacted</option><option>Follow-up</option><option>Qualified</option></select>
+          </div>
+          <div class="form-field">
+            <label>Probability</label>
+            <select id="probability"><option>LOW</option><option selected>MID</option><option>HIGH</option></select>
+          </div>
+          <div class="form-field">
+            <label>Target country</label>
+            <select id="targetCountry"><option>Select country</option><option>UK</option><option>USA</option><option>Canada</option><option>Australia</option><option>Germany</option></select>
+          </div>
+          <div class="form-field"><label>Target course</label><input type="text" id="targetCourse" placeholder="e.g. MSc Data Science"></div>
+          <div class="form-field" style="grid-column:1/-1;"><label>Target university</label><input type="text" id="targetUniversity" placeholder="e.g. University of Manchester"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-cancel" id="cancelModalBtn">Cancel</button>
+          <button type="submit" class="btn-submit">Add lead</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Create Group modal -->
+  <div class="modal-overlay" id="groupModalOverlay">
+    <div class="modal-box" style="width:480px;">
+      <div class="modal-head">
+        <h3>Create Group</h3>
+        <button class="modal-close" id="closeGroupModalBtn">&times;</button>
+      </div>
+      <form id="groupForm">
+        <div class="form-field" style="margin-bottom:14px;">
+          <label>Group Name *</label>
+          <input type="text" id="groupName" placeholder="e.g. Fall 2026 CS Applicants" required>
+        </div>
+        <div class="form-field">
+          <label>Description (Optional)</label>
+          <textarea id="groupDescription" rows="3" placeholder="What is this group for?"
+            style="width:100%; padding:9px 11px; border:1px solid #ddd; border-radius:8px; font-size:13.5px; color:#333; font-family:inherit; resize:vertical;"></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-cancel" id="cancelGroupModalBtn">Cancel</button>
+          <button type="submit" class="btn-submit" style="background:#555;">Create group</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Lead detail modal (read-only view when a row is clicked) -->
+  <div class="modal-overlay" id="detailModalOverlay">
+    <div class="modal-box">
+      <div class="modal-head">
+        <h3 id="detailName">Lead details</h3>
+        <button class="modal-close" id="closeDetailModalBtn">&times;</button>
+      </div>
+      <div class="form-grid" id="detailBody"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn-cancel" id="closeDetailBtn2">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <button class="chat-fab" title="Chat">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+  </button>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const name = params.get("name") || "User";
+    const email = params.get("email") || "";
+
+    document.getElementById("userName").textContent = name;
+    document.getElementById("userInitials").textContent =
+      name.split(" ").map(n => n.charAt(0)).slice(0, 2).join("").toUpperCase();
+    ["navDashboard", "navApplications", "navUniversities", "navDocuments"].forEach(id => {
+      const el = document.getElementById(id);
+      const base = el.getAttribute("href").split("?")[0];
+      el.href = `${base}?name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}`;
+    });
+
+    // ---- Leads state (starts empty, matches the live site with no leads yet) ----
+    let leads = [];
+
+    const emptyState = document.getElementById("emptyState");
+    const tableCard = document.getElementById("leadsTableCard");
+    const tbody = document.getElementById("leadsTableBody");
+
+    const stageClass = { "New Lead": "stage-new", "Contacted": "stage-contacted", "Follow-up": "stage-followup", "Qualified": "stage-qualified" };
+
+    function renderLeads() {
+      document.getElementById("statNewLeads").textContent = leads.filter(l => l.status === "New Lead").length;
+      document.getElementById("statClosed").textContent = leads.filter(l => l.status === "Qualified").length;
+      document.getElementById("statLost").textContent = 0;
+      document.getElementById("statTotalClosed").textContent = "$0";
+
+      if (leads.length === 0) {
+        emptyState.style.display = "flex";
+        tableCard.style.display = "none";
+        return;
+      }
+      emptyState.style.display = "none";
+      tableCard.style.display = "block";
+      tbody.innerHTML = "";
+      leads.forEach((lead, i) => {
+        const row = document.createElement("tr");
+        row.style.cursor = "pointer";
+        row.innerHTML = `
+          <td>${lead.firstName} ${lead.lastName}</td>
+          <td>${lead.email || "-"}</td>
+          <td>${lead.phone || "-"}</td>
+          <td><span class="stage-badge ${stageClass[lead.status] || "stage-new"}">${lead.status}</span></td>
+          <td>${lead.targetCountry || "-"}</td>
+        `;
+        row.addEventListener("click", () => openDetail(i));
+        tbody.appendChild(row);
+      });
+    }
+
+    // ---- Lead detail modal (click a row to view) ----
+    const detailOverlay = document.getElementById("detailModalOverlay");
+    function openDetail(i) {
+      const l = leads[i];
+      document.getElementById("detailName").textContent = `${l.firstName} ${l.lastName}`;
+      const fields = [
+        ["Email", l.email || "-"], ["Phone", l.phone || "-"],
+        ["Category", l.category || "-"], ["Source", l.source || "-"],
+        ["Status", l.status || "-"], ["Probability", l.probability || "-"],
+        ["Target country", l.targetCountry || "-"], ["Target course", l.targetCourse || "-"],
+      ];
+      document.getElementById("detailBody").innerHTML = fields.map(([label, val]) =>
+        `<div class="form-field"><label>${label}</label><div style="padding:9px 11px; border:1px solid #eee; border-radius:8px; font-size:13.5px; background:#fafafa;">${val}</div></div>`
+      ).join("");
+      detailOverlay.classList.add("open");
+    }
+    function closeDetail() { detailOverlay.classList.remove("open"); }
+    document.getElementById("closeDetailModalBtn").addEventListener("click", closeDetail);
+    document.getElementById("closeDetailBtn2").addEventListener("click", closeDetail);
+    detailOverlay.addEventListener("click", (e) => { if (e.target === detailOverlay) closeDetail(); });
+
+    // ---- Modal open/close ----
+    const overlay = document.getElementById("modalOverlay");
+    function openModal() { overlay.classList.add("open"); }
+    function closeModal() { overlay.classList.remove("open"); document.getElementById("leadForm").reset(); }
+
+    document.getElementById("openModalBtn").addEventListener("click", openModal);
+    document.getElementById("addFirstLeadBtn").addEventListener("click", openModal);
+    document.getElementById("closeModalBtn").addEventListener("click", closeModal);
+    document.getElementById("cancelModalBtn").addEventListener("click", closeModal);
+    overlay.addEventListener("click", (e) => { if (e.target === overlay) closeModal(); });
+
+    document.getElementById("leadForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      leads.push({
+        firstName: document.getElementById("firstName").value,
+        lastName: document.getElementById("lastName").value,
+        email: document.getElementById("leadEmail").value,
+        phone: document.getElementById("leadPhone").value,
+        category: document.getElementById("category").value,
+        source: document.getElementById("source").value,
+        status: document.getElementById("status").value,
+        probability: document.getElementById("probability").value,
+        targetCountry: document.getElementById("targetCountry").value,
+        targetCourse: document.getElementById("targetCourse").value,
+        targetUniversity: document.getElementById("targetUniversity").value,
+      });
+      closeModal();
+      renderLeads();
+    });
+
+    // ---- Tabs: List / Board / Pipeline share the leads view, Groups is separate ----
+    const leadsView = document.getElementById("leadsView");
+    const groupsView = document.getElementById("groupsView");
+    document.querySelectorAll(".tab").forEach(tab => {
+      tab.addEventListener("click", () => {
+        document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+        tab.classList.add("active");
+        if (tab.dataset.tab === "groups") {
+          leadsView.style.display = "none";
+          groupsView.style.display = "block";
+        } else {
+          groupsView.style.display = "none";
+          leadsView.style.display = "block";
+        }
+      });
+    });
+
+    // ---- Groups (Create Group modal, matches the real site) ----
+    let groups = [];
+    const groupOverlay = document.getElementById("groupModalOverlay");
+    const groupsEmptyState = document.getElementById("groupsEmptyState");
+    const groupsListCard = document.getElementById("groupsListCard");
+    const groupsTableBody = document.getElementById("groupsTableBody");
+
+    function openGroupModal() { groupOverlay.classList.add("open"); }
+    function closeGroupModal() { groupOverlay.classList.remove("open"); document.getElementById("groupForm").reset(); }
+
+    document.getElementById("createGroupBtn").addEventListener("click", openGroupModal);
+    document.getElementById("closeGroupModalBtn").addEventListener("click", closeGroupModal);
+    document.getElementById("cancelGroupModalBtn").addEventListener("click", closeGroupModal);
+    groupOverlay.addEventListener("click", (e) => { if (e.target === groupOverlay) closeGroupModal(); });
+
+    function renderGroups() {
+      if (groups.length === 0) {
+        groupsEmptyState.style.display = "flex";
+        groupsListCard.style.display = "none";
+        return;
+      }
+      groupsEmptyState.style.display = "none";
+      groupsListCard.style.display = "block";
+      groupsTableBody.innerHTML = "";
+      groups.forEach(g => {
+        const row = document.createElement("tr");
+        row.innerHTML = `<td>${g.name}</td><td>${g.description || "-"}</td><td>0</td>`;
+        groupsTableBody.appendChild(row);
+      });
+    }
+
+    document.getElementById("groupForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      groups.push({
+        name: document.getElementById("groupName").value,
+        description: document.getElementById("groupDescription").value,
+      });
+      closeGroupModal();
+      renderGroups();
+    });
+
+    renderLeads();
+    renderGroups();
+  </script>
+</body>
+</html>
